@@ -1,0 +1,8 @@
+buat web seperti contoh seimpan dengan fle index.html untuk hal pertama
+buat halaman kedua dengan program paket dan 
+buat web halamn 3 dengan sarana
+isi dari program paket dan sarana diambil dari file data-web
+berikan logo di semua hal
+berikan bg
+tmbhkn tombol untuk link ke halaman yg lain di semua halaman
+logo
