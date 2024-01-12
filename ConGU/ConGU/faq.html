@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FAQ - Location Monitoring & Network Speed</title>
+  <link rel="stylesheet" href="styleFAQ.css">
+</head>
+<body>
+  <main>
+    <section class="faq">
+      <h1>Frequently Asked Questions</h1>
+      <div class="faq-item">
+        <h2><span class="keyword">1. What is the purpose of this web?</span></h2>
+        <p>This wewb is designed to monitor location coordinates, network speed, and generate a table displaying time, latitude, longitude, average speed, speed category, complete address, and position accuracy.</p>
+      </div>
+
+      <div class="faq-item">
+        <h2><span class="keyword">2. How does it work?</span></h2>
+        <p>It uses Geolocation APIs to retrieve the device's current location and continuously monitor changes in position. It also measures network speed using simulated data.</p>
+      </div>
+
+      <div class="faq-item">
+        <h2><span class="keyword">3. What key functionalities does it offer?</span></h2>
+        <div class="answer">
+          <ul>
+            <li>Continuous monitoring of location coordinates.</li>
+            <li>Real-time calculation of average speed and categorization into speed categories.</li>
+            <li>Displaying current network speed.</li>
+            <li>Generating and downloading a table containing relevant location data.</li>
+          </ul>
+        </div>
+
+      <div class="faq-item">
+        <h2><span class="keyword">4. How does it display the location data?</span></h2>
+        <div class="answer">
+            <p>The web creates a table with columns for time, latitude, longitude, average speed, speed category, complete address, and position accuracy. It fetches the address information using latitude and longitude via an API call.</p>
+        </div>
+        
+      
+    <div class="faq-item">
+        <h2><span class="keyword">5. Can users interact with the script?</span></h2>
+        <div class="answer">
+            <p>Yes, users can download the location data table and reset the table using corresponding buttons provided in the interface.</p>
+        </div>
+
+    <div class="faq-item">
+        <h2><span class="keyword">6. What technologies or APIs does it utilize?</span></h2>
+        <div class="answer">
+            <ul>
+            <li>Geolocation API for location monitoring.</li>
+            <li>Google Maps API to display the user's current location on a map.</li>
+            <li>An external API (Nominatim OpenStreetMap) for address retrieval based on coordinates.</li>
+            </ul>
+        </div>
+    <div class="faq-item">
+        <h2><span class="keyword">7. How accurate is the position data displayed?</span></h2>
+        <div class="answer">
+            <p>It provides the accuracy of the position data in meters, updating the table to indicate whether the accuracy is within or beyond 500 meters.</p>
+        </div>   
+    <div class="faq-item">
+        <h2><span class="keyword">8. Are there any additional functionalities?</span></h2>
+        <div class="answer">
+            <p>Yes, it continuously measures network speed and plays an alarm sound if the speed drops below a certain threshold.</p>
+        </div>   
+    <div class="faq-item">
+        <h2><span class="keyword">9. How can users interact with the location on the map?</span></h2>
+        <div class="answer">
+            <p>The map displays the user's current location as a marker. As the user moves, the marker updates to reflect the new location.</p>
+        </div>   
+    <div class="faq-item">
+        <h2><span class="keyword">10. Does it handle errors related to geolocation or network speed measurement?</span></h2>
+        <div class="answer">
+            <p>Yes, it includes error handling to log and manage issues encountered during geolocation retrieval or network speed measurement.
+            </p>
+        </div>
+        
+
+        
+    <footer>
+        <p><b>Note:</b> The script is designed for educational purposes and may require adjustments for real-world use or integration into specific projects.</p>
+    </footer>
+    </section>
+  </main>
+</body>
+</html>
