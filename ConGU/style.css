@@ -1,0 +1,194 @@
+body {
+    margin: 5px;
+    background: rgb(255, 255, 255);
+  }
+  
+    /* Gaya untuk tombol */
+button {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bolder;
+    padding: 8px 17px;
+    font-size: 17px;
+    border-radius: 5px;
+    background-color:#34008d;
+    color:white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+button:hover {
+  background-color: #2980b9;
+  }
+
+canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      position: absolute;
+      z-index: -1;
+    }
+
+.container1 {
+  border: 5px solid #6218a2; /* Atur ketebalan, jenis, dan warna garis sesuai keinginan Anda */
+  padding: 5px;
+  background: #e6cee7;
+  width: fit-content; /* Atur lebar kotak */
+  height:fit-content;
+  margin: 0 auto; /* Agar kotak berada di tengah halaman */
+  border-radius: 15px;
+}
+
+.container2 {
+  border: 5px solid #292e98; /* Atur ketebalan, jenis, dan warna garis sesuai keinginan Anda */
+  padding: 5px;
+  background: #c4c7ff;
+  width: fit-content; /* Atur lebar kotak */
+  height: fit-content;
+  margin: 0 auto; /* Agar kotak berada di tengah halaman */
+  border-radius: 15px;
+}
+
+.container3 {
+  border: 5px solid #244283; /* Atur ketebalan, jenis, dan warna garis sesuai keinginan Anda */
+  padding: 5px;
+  background: #72bdff;
+  width: fit-content; /* Atur lebar kotak */
+  height: fit-content;
+  margin: 0 auto; /* Agar kotak berada di tengah halaman */
+  border-radius: 15px;
+}
+
+.container4 {
+  border: 5px solid #236883; /* Atur ketebalan, jenis, dan warna garis sesuai keinginan Anda */
+  padding: 5px;
+  background: #a0e7ff;
+  width: fit-content; /* Atur lebar kotak */
+  height: fit-content;
+  margin: 0 auto; /* Agar kotak berada di tengah halaman */
+  border-radius: 15px;
+}
+
+.container5 {
+  border: 5px solid #1e726e; /* Atur ketebalan, jenis, dan warna garis sesuai keinginan Anda */
+  padding: 5px;
+  background: #a5f6f2;
+  width: fit-content; /* Atur lebar kotak */
+  height: fit-content;
+  margin: 0 auto; /* Agar kotak berada di tengah halaman */
+  border-radius: 15px;
+}
+
+
+.container-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Gaya untuk section info */
+.info {
+  padding: 20px;
+  background-color: #fff;
+  margin: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.info h2 {
+  color: #333;
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.info p {
+  color: #555;
+  font-size: 1.1em;
+  line-height: 1.6;
+}
+
+.features {
+  padding: 20px;
+  background-color: #f9f9f9;
+  margin: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.features h2 {
+  color: #333;
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.features ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.features li {
+  color: #555;
+  font-size: 1.1em;
+  margin-bottom: 8px;
+}
+
+/* Efek hover untuk list pada Key Features */
+.features li:hover {
+  color: #f44336; /* Mengubah warna teks saat dihover */
+  cursor: pointer;
+}
+
+/* Gaya untuk bagian Action */
+.action {
+  padding: 20px;
+  background-color: #f9f9f9;
+  margin: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.action h2 {
+  color: #333;
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+/* Gaya untuk tombol */
+.action button {
+  padding: 10px 20px;
+  font-size: 1em;
+  background-color: #34008d;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+/* Gaya untuk teks dalam container */
+.container1,
+.container2,
+.container3,
+.container4,
+.container5 {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 1.5em;
+  color: black;
+  font-weight: bold;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+#downloadButton {
+  position:sticky;
+  bottom: 20px; /* Ubah sesuai dengan jarak dari bawah yang diinginkan */
+  left: 25%;
+  transform: translateX(-50%);
+}
+
+#clearButton {
+  position:sticky;
+  bottom: 20px; /* Ubah sesuai dengan jarak dari bawah yang diinginkan */
+  left: 50%;
+  transform: translateX(-50%);
+}
