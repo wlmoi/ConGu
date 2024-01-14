@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ConGu: Your Connectivity Guardian</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    #map {
+      height: 400px;
+      width: 100%;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <main>
+    <script>
+      var permissionAsked = false;
+      var alarmTriggered = false;
+      var signalHistory = [];
+      var tableDisplayed = false;
+      var chart;
+      
+      
+      var table = document.createElement('table');
+      table.id = 'locationTable';
+
+      // Membuat header untuk setiap kolom
+      var header = table.createTHead();
+      var row = header.insertRow();
+      var cell1 = row.insertCell();
+      var cell2 = row.insertCell();
+      var cell3 = row.insertCell();
+      var cell4 = row.insertCell();
+      var cell5 = row.insertCell();
+      var cell6 = row.insertCell();
+      var cell7 = row.insertCell();
+      var cell8 = row.insertCell();
+      var cell9 = row.insertCell();
+
+      cell1.innerHTML = "<b>Time</b>";
+      cell2.innerHTML = "<b>Latitude</b>";
+      cell3.innerHTML = "<b>Longitude</b>";
+      cell4.innerHTML = "<b>Average Speed</b>";
+      cell5.innerHTML = "<b>Speed Category</b>";
+      cell6.innerHTML = "<b>Standard Deviation</b>";
+      cell7.innerHTML = "<b>Speedoracy</b>";
+      cell8.innerHTML = "<b>Complete Address</b>";
+      cell9.innerHTML = "<b>Position Accuracy</b>";
+      // CSS untuk styling header
+
+      // Menambahkan class pada header untuk styling
+      cell1.classList.add('headerCell');
+      cell2.classList.add('headerCell');
+      cell3.classList.add('headerCell');
+      cell4.classList.add('headerCell');
+      cell5.classList.add('headerCell');
+      cell6.classList.add('headerCell');
+      cell7.classList.add('headerCell');
+      cell8.classList.add('headerCell');
+      cell9.classList.add('headerCell');
+
+      // Menambahkan class pada baris untuk styling
+      row.classList.add('dataRow');
+
+      var style = document.createElement('style');
+      style.innerHTML = `
+      .headerCell {
+        font-weight: bold;
+        background-color: #ead1ff;
+        padding: 8px;
+        text-align: center;
+      }
+
+      table {
+        width: calc(100% - 40px); /* Mengurangi 40px dari lebar untuk mempertahankan konsistensi */
+        border-collapse: collapse;
+        border: 1px solid #ddd;
+        background-color: #fff;
+        margin-bottom: 20px;
+        margin-left: 20px;
+        margin-right: 20px;
+      }
+
+      th, td {
+        padding: 8px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+      }
+
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      tr:hover {
+        background-color: #f0f0f0;
+      }
+    `;
+      document.head.appendChild(style);
+      document.body.appendChild(table);
+      function getLocation() {
+        if (!permissionAsked && navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+          showPosition,
+          errorHandler,
+          {
+            enableHighAccuracy: true, // Aktifkan mode high accuracy
+            timeout: 5000,
+            maximumAge: 0
+          }
+        );;
+          permissionAsked = true;
+        } else if (!navigator.geolocation) {
+          document.getElementById("demo1").innerHTML = "Geolocation tidak didukung oleh browser ini.";
+        }
+      }
+
+      navigator.geolocation.watchPosition(function(position) {
+  var latitude = position.coords.latitude;
+  var longitude = position.coords.longitude;
+  var accuracy = position.coords.accuracy;
+  var options = {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric',
+  timeZoneName: 'short'
+  };
+  
+  var time = new Date().toLocaleString('en-US', options);
+  var totalSpeed = signalHistory.reduce((total, signal) => total + signal.speed, 0);
+  var averageSpeed = totalSpeed / signalHistory.length;
+  var speedCategory = "";
+
+  var variance = calculateVariance(signalHistory, averageSpeed);
+  var standardDeviation = Math.sqrt(variance);
+  var interpretAccuracy =""
+  // Menentukan kategori kecepatan berdasarkan nilai rata-rata kecepatan
+    if (averageSpeed < 1) {
+      speedCategory = "Very Slow";
+    } else if (averageSpeed >= 1 && averageSpeed < 5) {
+      speedCategory = "Slow";
+    } else if (averageSpeed >= 5 && averageSpeed < 10) {
+      speedCategory = "Intermediate";
+    } else if (averageSpeed >= 10 && averageSpeed < 20) {
+      speedCategory = "Fast";
+    } else {
+      speedCategory = "Very Fast";
+    }
+    //Menganalisis Standar Deviasi untuk mengukur akurasi pemantauan jaringan
+    if (standardDeviation < 5) {
+      interpretAccuracy = "Extremely Accurate";
+    } else if (standardDeviation >= 5 && standardDeviation < 15) {
+      interpretAccuracy = "Very Accurate";
+    } else if (standardDeviation >= 15 && standardDeviation < 30) {
+      interpretAccuracy = "Moderately Accurate";
+    } else if (standardDeviation >= 30 && standardDeviation < 50) {
+      interpretAccuracy = "Fairly Accurate";
+    } else {
+      interpretAccuracy = "Not Accurate";
+    }
+  // Menggunakan API atau layanan tertentu untuk mendapatkan informasi lokasi berdasarkan latitude dan longitude ini
+  fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    var address = data.display_name; // Alamat lengkap dari koordinat
+    
+    // Menambahkan baris baru ke tabel
+  
+    if (signalHistory.length > 0 && !isNaN(averageSpeed)) {
+    // Menambahkan baris baru ke tabel hanya jika averageSpeed bukan NaN
+      var tableRef = document.getElementById('locationTable');
+      var newRow = tableRef.insertRow();
+
+      var cell1 = newRow.insertCell(0);
+      var cell2 = newRow.insertCell(1);
+      var cell3 = newRow.insertCell(2);
+      var cell4 = newRow.insertCell(3);
+      var cell5 = newRow.insertCell(4);
+      var cell6 = newRow.insertCell(5);
+      var cell7 = newRow.insertCell(6);
+      var cell8 = newRow.insertCell(7);
+      var cell9 = newRow.insertCell(8);
+
+      cell1.innerHTML = time.replace(/,/g, '_');
+      cell2.innerHTML = latitude.toFixed(6);
+      cell3.innerHTML = longitude.toFixed(6);
+      cell4.innerHTML = averageSpeed.toFixed(2);
+      cell5.innerHTML = speedCategory;
+      cell6.innerHTML = standardDeviation.toFixed(2);
+      cell7.innerHTML = interpretAccuracy;
+      cell8.innerHTML = address ? address.replace(/,/g, '_') : '-';
+      if (accuracy <= 500) {
+        cell9.innerHTML = `Accurate: ${accuracy} meters`;
+      } else {
+        cell9.innerHTML = `Inaccurate: ${accuracy} meters`;
+      }
+    }
+
+    
+  })
+  .catch(error => {
+    console.error('There was a problem with the fetch operation:', error);
+  });
+});
+        
+
+function downloadTable() {
+  // Mendapatkan tabel berdasarkan ID
+  const table = document.getElementById('locationTable');
+
+  // Membuat array untuk menyimpan baris tabel dalam format CSV
+  const csv = [];
+
+  // Mendapatkan semua baris dan kolom dari tabel
+  const rows = table.querySelectorAll('tr');
+  rows.forEach((row) => {
+    const rowData = [];
+    const columns = row.querySelectorAll('td');
+    columns.forEach((column) => {
+      // Menggunakan innerText untuk mendapatkan teks dari setiap sel dalam tabel
+      rowData.push(column.innerText);
+    });
+    // Menggabungkan setiap baris dalam array csv
+    csv.push(rowData.join(','));
+  });
+
+  // Menggabungkan setiap baris dalam satu string CSV
+  const csvContent = 'data:text/csv;charset=utf-8,' + csv.join('\n');
+
+  // Membuat elemen anchor untuk mendownload data
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedUri);
+  link.setAttribute('download', 'location_data.csv');
+  document.body.appendChild(link); // Untuk mendukung Firefox
+  link.click();
+}
+      
+function storeSignal() {
+  if (!permissionAsked && navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+        // Lakukan apapun dengan latitude dan longitude yang diperoleh
+        permissionAsked = true;
+
+        setInterval(function() {
+          var xhr = new XMLHttpRequest();
+          var startTime, endTime;
+
+          xhr.open('GET', 'https://raw.githubusercontent.com/NayakaZNA/markirr/main/source-code/main_with_GUI.py', true);
+          xhr.responseType = 'blob';
+
+          xhr.onload = function() {
+            endTime = performance.now();
+            measureNetworkSpeed(startTime, endTime, xhr.response);
+          };
+          
+          xhr.onerror = function(error) {
+            console.error('Error occurred while fetching the file:', error);
+          };
+
+          startTime = performance.now();
+          xhr.send();
+
+          function measureNetworkSpeed(startTime, endTime, downloadedData) {
+            var duration = endTime - startTime;
+            var dataSizeInBits = downloadedData.size*8;
+            var speed = ((dataSizeInBits / (duration / 1000)) / (1024 * 1024)).toFixed(2);
+
+            document.getElementById("demo2").innerHTML = "Network Speed: " + speed + " Mbps";
+
+            if (speed < 1) {
+              if (!navigator.onLine) {
+                setAlarm();
+              } else if (!alarmTriggered) {
+                setAlarm();
+                alarmTriggered = true;
+              }
+            } else {
+              alarmTriggered = false;
+            }
+
+            signalHistory.push({ speed: parseFloat(speed), timestamp: new Date() });
+            analyzeSignal(signalHistory);
+            updateChart(signalHistory);
+            
+            function setAlarm() {
+              var alarmSound = new Audio('audio.mp3');
+              alarmSound.play();
+            }
+      
+            window.addEventListener('offline', function() {
+              if (!navigator.onLine && !alarmTriggered) {
+                setAlarm();
+                alarmTriggered = true;
+              }
+            });
+          }
+        }, 1000); // 1000 milliseconds, setiap 1 detik
+      },
+      function(error) {
+        errorHandler(error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      }
+    );
+  }
+}
+  
+      function analyzeSignal(signalHistory) {
+      if (signalHistory.length > 0) {
+        var totalSpeed = signalHistory.reduce((total, signal) => total + signal.speed, 0);
+        var averageSpeed = totalSpeed / signalHistory.length;
+        var speedCategory = "";
+
+        var variance = calculateVariance(signalHistory, averageSpeed);
+        var standardDeviation = Math.sqrt(variance);
+        var interpretAccuracy =""
+        // Menentukan kategori kecepatan berdasarkan nilai rata-rata kecepatan
+        if (averageSpeed < 1) {
+          speedCategory = "Very Slow";
+        } else if (averageSpeed >= 1 && averageSpeed < 5) {
+          speedCategory = "Slow";
+        } else if (averageSpeed >= 5 && averageSpeed < 10) {
+          speedCategory = "Intermediate";
+        } else if (averageSpeed >= 10 && averageSpeed < 20) {
+          speedCategory = "Fast";
+        } else {
+          speedCategory = "Very Fast";
+        }
+        //Menganalisis Standar Deviasi untuk mengukur akurasi pemantauan jaringan
+        if (standardDeviation < 5) {
+          interpretAccuracy = "Extremely Accurate";
+        } else if (standardDeviation >= 5 && standardDeviation < 15) {
+          interpretAccuracy = "Very Accurate";
+        } else if (standardDeviation >= 15 && standardDeviation < 30) {
+          interpretAccuracy = "Moderately Accurate";
+        } else if (standardDeviation >= 30 && standardDeviation < 50) {
+          interpretAccuracy = "Fairly Accurate";
+        } else {
+          interpretAccuracy = "Not Accurate";
+        }
+
+        // Menampilkan nilai rata-rata kecepatan, varians, dan kategori kecepatan ke dalam elemen HTML
+        document.getElementById("averageSpeed").innerHTML = averageSpeed.toFixed(2);
+        document.getElementById("standardDeviation").innerHTML = standardDeviation.toFixed(2);
+        document.getElementById("speedCategory").innerHTML = speedCategory;
+        document.getElementById("interpretAccuracy").innerHTML = interpretAccuracy;
+
+      } else {
+        // Menampilkan pesan jika tidak ada data sinyal yang tersedia
+        document.getElementById("averageSpeed").innerHTML = "Tidak ada data";
+        document.getElementById("standardDeviation").innerHTML = "Tidak ada data";
+        document.getElementById("speedCategory").innerHTML = "Tidak ada data";
+        document.getElementById("interpretAccuracy").innerHTML = "Tidak ada data";
+      }
+    }
+  
+      setInterval(function() {
+        document.getElementById('startBtn').click();
+      }, 1000);
+
+      window.onload = function() {
+        getLocation();
+    };
+
+    function calculateVariance(signalHistory, mean) {
+  var squaredDifferences = signalHistory.map(signal => Math.pow(signal.speed - mean, 2));
+  var sumOfSquaredDiff = squaredDifferences.reduce((sum, squaredDiff) => sum + squaredDiff, 0);
+  var variance = sumOfSquaredDiff / signalHistory.length;
+  return variance;
+}
+
+    function clearTable() {
+  var table = document.getElementById('locationTable');
+  if (table) {
+    table.innerHTML = ''; // Menghapus semua isi dari tabel
+    var header = table.createTHead();
+    var row = header.insertRow();
+    var cell1 = row.insertCell();
+    var cell2 = row.insertCell();
+    var cell3 = row.insertCell();
+    var cell4 = row.insertCell();
+    var cell5 = row.insertCell();
+    var cell6 = row.insertCell();
+    var cell7 = row.insertCell();
+    var cell8 = row.insertCell();
+    var cell9 = row.insertCell();
+
+    cell1.innerHTML = "<b>Time</b>";
+    cell2.innerHTML = "<b>Latitude</b>";
+    cell3.innerHTML = "<b>Longitude</b>";
+    cell4.innerHTML = "<b>Average Speed</b>";
+    cell5.innerHTML = "<b>Speed Category</b>"
+    cell6.innerHTML = "<b>Standard Deviation</b>";
+    cell7.innerHTML = "<b>Speedoracy</b>";
+    cell8.innerHTML = "<b>Complete Address</b>";
+    cell9.innerHTML = "<b>Position Accuracy</b>";
+
+    // Menambahkan class pada header untuk styling
+    cell1.classList.add('headerCell');
+    cell2.classList.add('headerCell');
+    cell3.classList.add('headerCell');
+    cell4.classList.add('headerCell');
+    cell5.classList.add('headerCell');
+    cell6.classList.add('headerCell');
+    cell7.classList.add('headerCell');
+    cell8.classList.add('headerCell');
+    cell9.classList.add('headerCell');
+
+    // Menambahkan class pada baris untuk styling
+    row.classList.add('dataRow');
+  }
+}
+function updateChart(data) {
+  if (!chart) {
+    var ctx = document.getElementById('networkSpeedChart').getContext('2d');
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Network Speed Chart',
+          borderColor: 'rgb(75, 192, 192)',
+          borderWidth: 1,
+          pointRadius: 1.5, 
+          data: [],
+          fill: false
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            type: 'linear',
+            position: 'bottom',
+            title: {
+              display: true,
+              text: 'Detik'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Mbps'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Tambahkan data ke chart
+  var currentSecond = data.length;
+  chart.data.labels.push(currentSecond);
+  chart.data.datasets[0].data.push(data[data.length - 1].speed);
+
+  // Update chart
+  chart.update();
+}
+
+function resetChart() {
+  if (chart) {
+    // Reset data dan label
+    chart.data.labels = [];
+    chart.data.datasets[0].data = [];
+
+    // Update chart
+    chart.update();
+  }
+}
+    </script>
+
+    <section class="action">
+      <h2>Try it out!</h2>
+      <center>
+        <h3>Location Monitoring</h3>
+      </center>
+      <p id="demo1"></p>
+      <div id="map"></div>
+    </section>
+    <section class="action">
+      <p></p>
+          <center><button id="startBtn" onclick="storeSignal()">Network Speed Monitoring</button></center>
+      <p></p>
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDZSta_e-vLgVaUPsPc7ZryKpOaPVoXIRc&callback=initMap" async defer></script>
+      <script>
+        let map;
+        let currentMarker;
+      
+        function initMap() {
+          // Fungsi untuk mendapatkan lokasi terkini
+          function getLocation() {
+            if (navigator.geolocation) {
+              navigator.geolocation.watchPosition(showPosition, handleError, {
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 0,
+              });
+            } else {
+              console.log("Geolocation is not supported by this browser.");
+            }
+          }
+      
+          // Fungsi untuk menampilkan koordinat terkini
+          function showPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+      
+            if (!map) {
+              const mapOptions = {
+                center: { lat: latitude, lng: longitude },
+                zoom: 10 // Sesuaikan dengan kebutuhan
+              };
+      
+              map = new google.maps.Map(document.getElementById('map'), mapOptions);
+            } else {
+              map.setCenter({ lat: latitude, lng: longitude });
+            }
+      
+            if (currentMarker) {
+              currentMarker.setMap(null); // Menghapus marker sebelumnya
+            }
+      
+            currentMarker = new google.maps.Marker({
+              position: { lat: latitude, lng: longitude },
+              map: map,
+              title: 'Lokasi Anda' // Judul marker
+            });
+          }
+      
+          function handleError(error) {
+            console.log("Error getting location:", error);
+          }
+      
+          // Memanggil fungsi getLocation saat halaman dimuat
+          getLocation();
+        }
+      </script>
+      <p></p>
+      <div class="container1">
+        <font face="times new roman" size="5" color="black" style="font-weight: bold;" style="line-height:normal;">
+          <p id="demo2"></p>
+        </font>
+      </div>      
+      <p></p>
+      <div class="container-wrapper">
+        <div class="container2">
+          <p>Average Speed: <span id="averageSpeed"></span> Mbps</p>
+        </div>
+        <div class="container3">
+          <p>Speed Category: <span id="speedCategory"></span></p>
+        </div>
+      </div>
+      <p></p>
+      <div class="container-wrapper">
+        <div class="container4">
+          <font face="times new roman" size="5" color="black" style="font-weight: bold;" style="line-height:normal;"></font>
+            <p>Standard Deviation: <span id="standardDeviation"></span> Mbps</p>
+          </font>
+        </div>
+        <div class="container5">
+          <font face="times new roman" size="5" color="black" style="font-weight: bold;" style="line-height:normal;"></font>
+            <p>Speedoracy: <span id="interpretAccuracy"></span></p>
+          </font>
+        </div>
+      </div>
+    </section>
+    <section class="action">
+      <div class="chart-container">
+        <canvas id="networkSpeedChart" width="1300"></canvas>
+      </div>
+      <center><button onclick="resetChart()">Reset Chart</button></center>
+    </section>
+  </main>
+  <footer>
+    <div class="container-wrapper">
+      <button onclick="downloadTable()" id="downloadButton" >Download Tabel</button>
+      <button onclick="clearTable()" id="clearButton" >Reset Tabel</button>
+    </div>
+    <p>&copy; 2023 ConGu. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>
