@@ -1,0 +1,26 @@
+        body {
+            background-color: #252461;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: 4em;
+        }
+        table {
+            margin: auto;
+            border-collapse: collapse;
+        }
+        td {
+            padding: 20px;
+            text-align: center;
+            vertical-align: top;
+            border: 1px solid #ffffff;
+        }
+        img {
+            width: 200px;
+            border-radius: 10px;
+        }
+        p {
+            color: #ffffff;
+        }
